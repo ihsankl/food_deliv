@@ -6,7 +6,9 @@ const bodyParser = require('body-parser');
 const items = require('./route/items');
 const restaurants = require('./route/restaurants');
 const carts = require('./route/carts');
+const review = require('./route/review');
 const categories = require('./route/categories');
+const query = require('./model/query')
 // const { auth } = require('./src/middleware');
 const port = process.env.APP_PORT;
 
@@ -20,6 +22,8 @@ app.use('/items', items);
 app.use('/categories', categories);
 // app.use('/carts', auth, carts)
 app.use('/carts', carts);
+// app.use('/review', auth, review);
+app.use('/review', review);
 // app.use('/restaurants', auth, restaurants)
 app.use('/restaurants', restaurants);
 // app.use('/user', user)
@@ -29,8 +33,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/tes', (req, res) => {
-    req.query; // { color: ['black', 'yellow'], 'shoe[color]': 'white' }
-  res.json(req.query);
+     // { color: ['black', 'yellow'], 'shoe[color]': 'white' }
+     console.log(query)
+  
 });
 
 app.post('/', (req, res) => {

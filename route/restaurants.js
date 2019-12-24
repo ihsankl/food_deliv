@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const db = require('../config/config');
+const query = require('../model/query');
 
 router.get('/', (req, res) => {
-    db.execute(`SELECT restaurants.name, restaurants.logo, restaurants.location, restaurants.description, users.username AS user FROM restaurants INNER JOIN users ON restaurants.user = users.id`, [], (err, result, field) => {
+    db.execute(query.query_get_restaurants, [], (err, result, field) => {
         console.log(err);
         res.send({
             "success": true,
@@ -13,44 +14,54 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     const { user, name, logo, location, description } = req.body;
-    const sql = 'INSERT INTO restaurants (user, name, logo, location, description) VALUES(?, ?, ?, ?, ?)';
-
     db.execute(
-        sql, [
+        query.query_insert_restaurants, [
         user, name, logo, location, description
     ],
         (err, result, field) => {
             console.log(err)
-            res.send(result)
+            res.send({
+                "success": true,
+                "data": result
+            });
         }
     )
 });
 
 router.put('/:id', (req, res) => {
     const { user, name, logo, location, description } = req.body;
-    const sql = 'UPDATE restaurants SET user=?, name=?, logo=?, location=?, description=? WHERE id=?';
-
     db.execute(
-        sql, [
+        query.query_update_restaurants, [
         user, name, logo, location, description, req.params.id
     ],
         (err, result, field) => {
             console.log(err)
-            res.send(result)
+            res.send({
+                "success": true,
+                "data": result
+            });
         }
     )
 });
 
 router.delete('/:id', (req, res) => {
-    const sql = `DELETE FROM restaurants WHERE id=?`;
-
     db.execute(
-        sql, [
+        query.query_delete_restaurants, [
         req.params.id
     ],
         (err, result, field) => {
             console.log(err)
-            res.send(result)
+            if (result.affectedRows > 0) {
+                res.send({
+                    "success": true,
+                    "data": result
+                });
+            } else {
+                res.send({
+                    "success": false,
+                    "msg": 'no such data'
+                });
+            }
         }
     )
 })

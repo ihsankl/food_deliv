@@ -19,12 +19,12 @@ router.post('/', (req, res) => {
         sql, [
         name
     ],
-        (err, result, rows) => {
+        (err, result, field) => {
             console.log(err)
             if (result) {
                 res.send({
                     "success": true,
-                    "data": rows
+                    "data": field
                 });
             }else{
                 res.send({
@@ -62,7 +62,7 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-    const sql = `DELETE FROM restaurants WHERE id=?`;
+    const sql = `DELETE FROM categories WHERE id=?`;
 
     db.execute(
         sql, [
@@ -70,7 +70,10 @@ router.delete('/:id', (req, res) => {
     ],
         (err, result, field) => {
             console.log(err)
-            res.send(result)
+            res.send({
+                "success": false,
+                "data": 'no such data'
+            });
         }
     )
 })

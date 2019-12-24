@@ -1,15 +1,15 @@
 const router = require('express').Router();
 const db = require('../config/config');
+const query = require('../model/query');
 
 router.get('/', (req, res) => {
-    db.execute(`SELECT items.name, items.price, items.description, AVG(review.ratings) AS ratings, items.images, items.date_created, items.date_updated, categories.name AS category, users.username AS created_by FROM items INNER JOIN categories ON items.category = categories.id INNER JOIN users ON items.created_by = users.id INNER JOIN review ON items.id = review.item GROUP BY review.item`, [], (err, result, field) => {
+    db.execute(query.query_get_items, [], (err, result, field) => {
         console.log(err);
         res.send({
             "success": true,
             "data": result
         });
     })
-
 });
 
 // if (req.query.search) {
@@ -74,14 +74,14 @@ router.get('/sort_by', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const { name, category, created_by, price, description, images, ratings } = req.body;
+
+    const { name, category, created_by, price, description, images } = req.body;
     const date_created = new Date()
     const date_updated = new Date()
-    const sql = 'INSERT INTO items (name, category, created_by, price, description, images, ratings, date_created, date_updated) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
     db.execute(
-        sql, [
-        name, category, created_by, price, description, images, ratings, date_created, date_updated
+        query.query_insert_items, [
+        name, category, created_by, price, description, images, date_created, date_updated
     ],
         (err, result, field) => {
             console.log(err);
@@ -94,13 +94,12 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-    const { name, category, created_by, price, description, images, ratings } = req.body;
+    const { name, category, created_by, price, description, images } = req.body;
     const date_updated = new Date()
-    const sql = 'UPDATE items SET name=?, category=?, created_by=?, price=?, description=?, images=?, ratings=?, date_updated=? WHERE id=?';
 
     db.execute(
-        sql, [
-        name, category, created_by, price, description, images, ratings, date_updated, req.params.id
+        query.query_update_items, [
+        name, category, created_by, price, description, images, date_updated, req.params.id
     ],
         (err, result, field) => {
             console.log(err)
@@ -113,18 +112,23 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-    const sql = `DELETE FROM items WHERE id=?`;
-
     db.execute(
-        sql, [
+        query.query_delete_items, [
         req.params.id
     ],
         (err, result, field) => {
             console.log(err)
-            res.send({
-                "success": true,
-                "data": result
-            });
+            if (result.affectedRows > 0) {
+                res.send({
+                    "success": true,
+                    "data": result
+                });   
+            }else{
+                res.send({
+                    "success": false,
+                    "msg": 'no such data'
+                });
+            }
         }
     )
 })

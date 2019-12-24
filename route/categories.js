@@ -1,22 +1,29 @@
 const router = require('express').Router();
 const db = require('../config/config');
+const query = require('../model/query')
 
 router.get('/', (req, res) => {
-    db.execute(`SELECT * FROM categories`, [], (err, result, field) => {
+    db.execute(query.category_get, [], (err, result, field) => {
         console.log(err);
-        res.send({
-            "success": true,
-            "data": result
-        });
+        if (result.length === 0) {
+            res.send({
+                "success": false,
+                "msg": 'no data provided'
+            });
+        } else {
+            res.send({
+                "success": true,
+                "data": result
+            });
+        }
     })
 });
 
 router.post('/', (req, res) => {
     const { name } = req.body;
-    const sql = 'INSERT INTO categories ( name ) VALUES(?)';
 
     db.execute(
-        sql, [
+        query.category_insert, [
         name
     ],
         (err, result, field) => {
@@ -26,7 +33,7 @@ router.post('/', (req, res) => {
                     "success": true,
                     "data": field
                 });
-            }else{
+            } else {
                 res.send({
                     "success": false,
                     "data": 'no such data'
@@ -37,11 +44,10 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-    const { name  } = req.body;
-    const sql = 'UPDATE categories SET name=? WHERE id=?';
+    const { name } = req.body;
 
     db.execute(
-        sql, [
+        query.category_update, [
         name, req.params.id
     ],
         (err, result, field) => {
@@ -51,7 +57,7 @@ router.put('/:id', (req, res) => {
                     "success": true,
                     "data": field
                 });
-            }else{
+            } else {
                 res.send({
                     "success": false,
                     "data": 'no such data'
@@ -62,10 +68,8 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-    const sql = `DELETE FROM categories WHERE id=?`;
-
     db.execute(
-        sql, [
+        query.category_delete, [
         req.params.id
     ],
         (err, result, field) => {

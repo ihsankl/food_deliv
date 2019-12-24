@@ -17,7 +17,13 @@ const query = {
 
     query_delete_restaurants:`DELETE FROM restaurants WHERE id=?`,
 
-    
+    category_get:`SELECT * FROM categories`,
+
+    category_insert:`INSERT INTO categories ( name ) VALUES(?)`,
+
+    category_update:`UPDATE categories SET name=? WHERE id=?`,
+
+    category_delete:`DELETE FROM categories WHERE id=?`
 }
 
 module.exports = query;

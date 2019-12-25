@@ -2,11 +2,11 @@ const jwt = require('jsonwebtoken');
 const secret = process.env.APP_KEY;
 
 const auth = (req, res, next) => {
+    console.log(req.headers['roles'])
     if (req.headers['authorization'] && req.headers['authorization'].startsWith('Bearer')) {
         const jwt_token = req.headers['authorization'].substr(7);
         try {
             const user = jwt.verify(jwt_token, secret);
-            console.log(req.headers)
             next()
         } catch (error) {
             res.send({ success: false, msg: error })

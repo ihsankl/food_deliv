@@ -4,6 +4,7 @@ const app = Express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const items = require('./route/items');
+const user = require('./route/user');
 const restaurants = require('./route/restaurants');
 const carts = require('./route/carts');
 const review = require('./route/review');
@@ -13,7 +14,7 @@ const query = require('./model/query')
 const port = process.env.APP_PORT;
 
 app.use(cors());
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.set('query parser', 'simple');
 // app.use('/items', auth, items)
@@ -26,22 +27,22 @@ app.use('/carts', carts);
 app.use('/review', review);
 // app.use('/restaurants', auth, restaurants)
 app.use('/restaurants', restaurants);
-// app.use('/user', user)
+app.use('/user', user)
 
 app.get('/', (req, res) => {
     res.send('App worked out');
 });
 
 app.get('/tes', (req, res) => {
-     // { color: ['black', 'yellow'], 'shoe[color]': 'white' }
-     console.log(query)
-  
+    // { color: ['black', 'yellow'], 'shoe[color]': 'white' }
+    console.log(query)
+
 });
 
 app.post('/', (req, res) => {
     res.send(req.body);
 });
 
-app.listen(port, ()=>{
+app.listen(port, () => {
     console.log(`app listening on port ${port}`);
 });

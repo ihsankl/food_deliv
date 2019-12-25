@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const db = require('../config/config');
 const query = require('../model/query')
+const { auth, all, admin_restaurant, admin_customer, restaurant_customer, admin, restaurant, customer } = require('../config/middleware');
 
-router.get('/', (req, res) => {
+router.get('/', auth, all, (req, res) => {
     db.execute(query.category_get, [], (err, result, field) => {
         console.log(err);
         if (result.length === 0) {
@@ -19,7 +20,7 @@ router.get('/', (req, res) => {
     })
 });
 
-router.post('/', (req, res) => {
+router.post('/', auth, admin_restaurant, (req, res) => {
     const { name } = req.body;
 
     db.execute(
@@ -43,7 +44,7 @@ router.post('/', (req, res) => {
     )
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', auth, admin_restaurant, (req, res) => {
     const { name } = req.body;
 
     db.execute(
@@ -67,7 +68,7 @@ router.put('/:id', (req, res) => {
     )
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', auth, admin_restaurant, (req, res) => {
     db.execute(
         query.category_delete, [
         req.params.id

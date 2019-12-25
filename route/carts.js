@@ -1,21 +1,22 @@
 const router = require('express').Router();
 const db = require('../config/config');
+const { auth, all, admin_restaurant, admin_customer, restaurant_customer, admin, restaurant, customer } = require('../config/middleware');
 
-router.get('/', (req, res) => {
-    db.execute(`SELECT items.name AS item, users.username AS user FROM carts INNER JOIN items ON carts.item = items.id INNER JOIN users ON carts.user = users.id`, [], (err, result, field) => {
+router.get('/', auth, all, (req, res) => {
+    db.execute(`SELECT items.name AS item, users.username AS user, carts.total FROM carts INNER JOIN items ON carts.item = items.id INNER JOIN users ON carts.user = users.id`, [], (err, result, field) => {
         console.log(err);
         res.send(result);
     })
 });
 
-router.post('/', (req, res) => {
-    const { item, user } = req.body;
+router.post('/', auth, all, (req, res) => {
+    const { item, user, total } = req.body;
     
-    const sql = 'INSERT INTO carts (item, user) VALUES(?, ?)';
+    const sql = 'INSERT INTO carts (item, user, total) VALUES(?, ?, ?)';
 
     db.execute(
         sql, [
-            item, user
+            item, user, total
     ],
         (err, result, field) => {
             console.log(err);
@@ -24,14 +25,14 @@ router.post('/', (req, res) => {
     )
 });
 
-router.put('/:id', (req, res) => {
-    const { item, user } = req.body;
+router.put('/:id', auth, all, (req, res) => {
+    const { item, user, total } = req.body;
     const date_updated = new Date()
-    const sql = 'UPDATE items SET item=?, user=? WHERE id=?';
+    const sql = 'UPDATE items SET item=?, user=?, total=? WHERE id=?';
 
     db.execute(
         sql, [
-            item, user, req.params.id
+            item, user, total, req.params.id
     ],
         (err, result, field) => {
             console.log(err)
@@ -40,7 +41,7 @@ router.put('/:id', (req, res) => {
     )
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', auth, all, (req, res) => {
     const sql = `DELETE FROM carts WHERE id=?`;
 
     db.execute(

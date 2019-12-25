@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const db = require('../config/config');
+const { auth, all, admin_restaurant, admin_customer, restaurant_customer, admin, restaurant, customer } = require('../config/middleware');
 
-router.get('/', (req, res) => {
+router.get('/', auth, all, (req, res) => {
     db.execute(`SELECT * FROM review`, [], (err, result, field) => {
         console.log(err);
         if (result.length === 0) {
@@ -17,7 +18,7 @@ router.get('/', (req, res) => {
     })
 });
 
-router.post('/', (req, res) => {
+router.post('/', auth, all, (req, res) => {
     const { review, user, item, ratings } = req.body;
     const sql = 'INSERT INTO review ( review, user, item, ratings ) VALUES(?, ?, ?, ?)';
 
@@ -43,7 +44,7 @@ router.post('/', (req, res) => {
     )
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', auth, all, (req, res) => {
     const { review, user, item, ratings } = req.body;
     const sql = 'UPDATE review SET review=?, user=?, item=?, ratings=? WHERE id=?';
 
@@ -68,7 +69,7 @@ router.put('/:id', (req, res) => {
     )
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', auth, all, (req, res) => {
     const sql = `DELETE FROM review WHERE id=?`;
 
     db.execute(

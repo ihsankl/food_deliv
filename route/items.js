@@ -2,6 +2,85 @@ const router = require('express').Router();
 const db = require('../config/config');
 const query = require('../model/query');
 const { auth, all, admin_restaurant, admin_customer, restaurant_customer, admin, restaurant, customer } = require('../config/middleware');
+const { post_items } = require('../model/model');
+const multer = require('multer');
+const fs = require('fs');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './img');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const fileFilter = (req, file, callback) => {
+    // accept image only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/)) {
+        return callback(new Error('Only image files are allowed!'), false);
+    }
+    callback(null, true);
+};
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+
+router.post('/image/:id', auth, admin_restaurant, upload.single('image'), (req, res) => {
+    // try {
+    //   res.send(req.file);
+    // }catch(err) {
+    //   res.send(400);
+    // }
+    const sql = `UPDATE items SET images=? WHERE id=?`
+    db.execute(
+        sql, [req.file.filename, req.params.id],
+        (err, result, field) => {
+            console.log(err)
+            res.send({
+                "success": true,
+                "data": result
+            });
+        }
+    )
+});
+
+router.delete('/image/:id', auth, admin_restaurant, (req, res) => {
+    const sql = `SELECT images FROM items WHERE id=?`
+    db.execute(sql, [req.params.id], (err1, result1, field1) => {
+        console.log(err1);
+        if (err1) {
+            res.send('not found 1')
+        } else {
+            const image = ''
+            const del = `UPDATE items SET images=? WHERE id=?`
+            db.execute(del, [image, req.params.id], (err2, result2, field2) => {
+                if (err2) {
+                    console.log(err2)
+                    res.send('not found 2')
+                } else {
+                    if (!result1[0].images) {
+                        console.log('file not found')
+                        res.send('file not found')
+                    } else {
+                        fs.unlink(`./img/${result1[0].images}`, (err3) => {
+                            if (err3) {
+                                console.log(err3, result1)
+                                res.send(err3)
+                            } else {
+                                // if no error, file has been deleted successfully
+                                console.log('File deleted!');
+                                res.send({
+                                    "success": true,
+                                    "msg": 'file deleted'
+                                });
+                            }
+                        });
+                    }
+                }
+            })
+        }
+    })
+
+});
 
 router.get('/', auth, all, (req, res) => {
     if (req.query.page) {
@@ -23,6 +102,7 @@ router.get('/', auth, all, (req, res) => {
                     sort_by = 'items.date_updated';
                     sort_met = req.query.sort.date_updated;
                 }
+                // JANGAN LUPA RATINGS NYA BLOM CUYY
 
                 req.query.search.name ? name = `%${req.query.search.name}%` : name = '%%'
                 req.query.search.price ? price = `%${req.query.search.price}%` : price = '%%'
@@ -35,7 +115,7 @@ router.get('/', auth, all, (req, res) => {
                             "success": false,
                             "msg": 'no such data'
                         });
-                    }else{
+                    } else {
                         res.send({
                             "success": true,
                             "data": result
@@ -47,11 +127,14 @@ router.get('/', auth, all, (req, res) => {
                 req.query.search.price ? price = `%${req.query.search.price}%` : price = '%%'
                 req.query.search.ratings ? ratings = `%${req.query.search.ratings}%` : ratings = '%%'
                 if (req.query.page === '1') {
-                    page = 0
+                    page = 'LIMIT 5 OFFSET 0'
+                } else if (req.query.page === 'all') {
+                    page = ''
                 } else {
-                    page = (req.query.page) * 5
+                    offset = (req.query.page) * 5
+                    page = `LIMIT 5 OFFSET ${offset}`
                 }
-                db.execute(query.query_search_items, [name, price, ratings, page], (err, result, field) => {
+                db.execute(`${query.query_search_items} ${page}`, [name, price], (err, result, field) => {
                     console.log(err);
                     if (result.length === 0) {
                         res.send({
@@ -68,11 +151,14 @@ router.get('/', auth, all, (req, res) => {
             }
         } else {
             if (req.query.page === '1') {
-                page = 0
+                page = 'LIMIT 5 OFFSET 0'
+            } else if (req.query.page === 'all') {
+                page = ''
             } else {
-                page = (req.query.page) * 5
+                offset = (req.query.page) * 5
+                page = `LIMIT 5 OFFSET ${offset}`
             }
-            db.execute(query.query_paging_items, [page], (err, result, field) => {
+            db.execute(`${query.query_get_items} ${page}`, [], (err, result, field) => {
                 console.log(err);
                 if (result.length === 0) {
                     res.send({
@@ -88,7 +174,7 @@ router.get('/', auth, all, (req, res) => {
             })
         }
     } else {
-        db.execute(query.query_get_items, [], (err, result, field) => {
+        db.execute(`${query.query_get_items}`, [], (err, result, field) => {
             console.log(err);
             res.send({
                 "success": true,
@@ -104,18 +190,7 @@ router.post('/', auth, admin_restaurant, (req, res) => {
     const date_created = new Date()
     const date_updated = new Date()
 
-    db.execute(
-        query.query_insert_items, [
-        restaurant, name, category, created_by, price, description, images, date_created, date_updated
-    ],
-        (err, result, field) => {
-            console.log(err);
-            res.send({
-                "success": true,
-                "data": result
-            });
-        }
-    )
+    post_items(res, restaurant, name, category, created_by, price, description, images, date_created, date_updated)
 });
 
 router.put('/:id', auth, admin_restaurant, (req, res) => {
@@ -156,7 +231,7 @@ router.delete('/:id', auth, admin_restaurant, (req, res) => {
             }
         }
     )
-})
+});
 
 // app.post('/barang', async (req, res) => {
 //     const { kode_barang, nama_barang, kategori, harga_pokok, harga_distributor, harga_jual, stok } = req.body;

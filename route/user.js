@@ -15,12 +15,20 @@ router.post('/login', (req, res) => {
             if (bcrypt.compareSync(password, result[0].password)) {
                 const auth = jwt.sign({ username: username }, secret);
                 // username:username SAMA AJA DENGAN username
-                res.send({
-                    success: true,
-                    auth: auth,
-                    'roles':result[0].roles,
-                    // "data": result
-                    // auth:auth BISA JUGA auth
+                const signed_out = 'false'
+                const signed = `INSERT INTO revoked_tokens(token, signed_out) VALUES(?, ?)`
+                db.execute(signed, [auth, signed_out], (err2, result2, field2) => {
+                    if (err) {
+                        console.log(err2)
+                        res.send('error');
+                    } else {
+                        res.send({
+                            success: true,
+                            auth: auth,
+                            roles: result[0].roles
+                            // auth:auth BISA JUGA auth
+                        })
+                    }
                 })
             } else {
                 res.send({
@@ -90,6 +98,22 @@ router.put('/:id', auth, admin, (req, res) => {
             })
         }
     );
+});
+
+router.delete('/logout', auth, (req, res) => {
+    const jwt_token = req.headers['authorization'].substr(7);
+    const signed_out = 'true'
+    const sql = `UPDATE revoked_tokens SET signed_out = ? WHERE token = ?`
+
+    db.execute(`UPDATE revoked_tokens SET signed_out = '${signed_out}' WHERE token = '${jwt_token}'`, (err, result, field) => {
+        if (err) {
+            console.log(err)
+            res.send('error')
+        } else {
+            res.send('signed out')
+        }
+    })
+
 });
 
 module.exports = router;

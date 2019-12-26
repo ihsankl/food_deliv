@@ -131,7 +131,7 @@ router.get('/', auth, all, (req, res) => {
                 } else if (req.query.page === 'all') {
                     page = ''
                 } else {
-                    offset = (req.query.page) * 5
+                    offset = ((req.query.page) * 5) - 5
                     page = `LIMIT 5 OFFSET ${offset}`
                 }
                 db.execute(`${query.query_search_items} ${page}`, [name, price], (err, result, field) => {
@@ -155,7 +155,8 @@ router.get('/', auth, all, (req, res) => {
             } else if (req.query.page === 'all') {
                 page = ''
             } else {
-                offset = (req.query.page) * 5
+                offset = ((req.query.page) * 5) - 5
+                // DONT LIMIT BY 5 FOREVER
                 page = `LIMIT 5 OFFSET ${offset}`
             }
             db.execute(`${query.query_get_items} ${page}`, [], (err, result, field) => {

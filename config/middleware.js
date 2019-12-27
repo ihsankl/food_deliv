@@ -12,7 +12,9 @@ const auth = (req, res, next) => {
                 console.log(err)
                 res.send('error')
             } else {
-                if (result[0].signed_out === 'true' || !result[0].signed_out) {
+                if (result.length === 0) {
+                    res.send({ success: false, msg: 'Please login!' })
+                } else if (result[0].signed_out === 'true') {
                     res.send({ success: false, msg: 'Please login!' })
                 } else {
                     try {

@@ -12,7 +12,16 @@ const storage = multer.diskStorage({
         cb(null, file.originalname);
     }
 });
-const upload = multer({ storage: storage });
+
+const fileFilter = (req, file, callback) => {
+    // accept image only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/)) {
+        return callback(new Error('Only image files are allowed!'), false);
+    }
+    callback(null, true);
+};
+
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 router.post('/logo/:id', auth, admin_restaurant, upload.single('logo'), (req, res) => {
     // try {

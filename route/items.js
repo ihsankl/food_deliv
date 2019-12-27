@@ -185,6 +185,45 @@ router.get('/', auth, all, (req, res) => {
     }
 });
 
+router.get('/:id', auth, all, (req, res) => {
+    const { id } = req.params;
+
+    const sql = `SELECT * FROM items WHERE id = ?`
+    db.execute(
+        sql, [
+        id
+    ],
+        (err1, result1, field1) => {
+            if (err1) {
+                console.log(err1)
+                res.send({
+                    "success": false,
+                    "msg": 'error'
+                });
+            } else {
+                const related = result1[0].category
+                const recommended = `SELECT * FROM items WHERE category = ? LIMIT 5`
+
+                db.execute(recommended, [related], (err2, result2, field2) => {
+                    if (err2) {
+                        console.log(err2)
+                        res.send({
+                            "success": false,
+                            "msg": 'error'
+                        });
+                    } else {
+                        res.send({
+                            "success": true,
+                            "data": result1,
+                            showcase: result2
+                        });
+                    }
+                })
+            }
+        }
+    )
+});
+
 router.post('/', auth, admin_restaurant, (req, res) => {
 
     const { restaurant, name, category, created_by, price, description, images } = req.body;

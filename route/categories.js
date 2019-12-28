@@ -1,21 +1,55 @@
 const router = require('express').Router();
 const db = require('../config/config');
 const query = require('../model/query')
-const { auth, all, admin_restaurant, admin_customer, restaurant_customer, admin, restaurant, customer } = require('../config/middleware');
+const { auth, all, admin_restaurant } = require('../config/middleware');
+const uuidv1 = require('uuid/v1');
 
 router.get('/', auth, all, (req, res) => {
-    db.execute(query.category_get, [], (err, result, field) => {
-        console.log(err);
-        if (result.length === 0) {
+    db.execute(`SELECT * FROM categories`, [], (err, result, field) => {
+        if (err) {
+            console.log(err)
             res.send({
-                "success": false,
-                "msg": 'no data provided'
-            });
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
+        } else if (result.length === 0) {
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: "No data retrieved!",
+            })
         } else {
             res.send({
-                "success": true,
-                "data": result
-            });
+                uuid: uuidv1(),
+                status: 200,
+                data: result
+            })
+        }
+    })
+});
+
+router.get('/:id', auth, all, (req, res) => {
+    db.execute(`SELECT * FROM categories WHERE id = ?`, [req.params.id], (err, result, field) => {
+        if (err) {
+            console.log(err)
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
+        } else if (result.length === 0) {
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: "No data retrieved!",
+            })
+        } else {
+            res.send({
+                uuid: uuidv1(),
+                status: 200,
+                data: result
+            })
         }
     })
 });
@@ -23,22 +57,21 @@ router.get('/', auth, all, (req, res) => {
 router.post('/', auth, admin_restaurant, (req, res) => {
     const { name } = req.body;
 
-    db.execute(
-        query.category_insert, [
-        name
-    ],
+    db.execute(`INSERT INTO categories ( name ) VALUES(?)`, [name],
         (err, result, field) => {
-            console.log(err)
-            if (result) {
+            if (err) {
+                console.log(err)
                 res.send({
-                    "success": true,
-                    "data": field
-                });
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err,
+                })
             } else {
                 res.send({
-                    "success": false,
-                    "data": 'no such data'
-                });
+                    uuid: uuidv1(),
+                    status: 200,
+                    msg: "Data insertion completed!"
+                })
             }
         }
     )
@@ -47,50 +80,45 @@ router.post('/', auth, admin_restaurant, (req, res) => {
 router.put('/:id', auth, admin_restaurant, (req, res) => {
     const { name } = req.body;
 
-    db.execute(
-        query.category_update, [
-        name, req.params.id
-    ],
+    db.execute(`UPDATE categories SET name=? WHERE id=?`, [name, req.params.id],
         (err, result, field) => {
-            console.log(err)
-            if (result) {
+            if (err) {
+                console.log(err)
                 res.send({
-                    "success": true,
-                    "data": field
-                });
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err,
+                })
             } else {
                 res.send({
-                    "success": false,
-                    "data": 'no such data'
-                });
+                    uuid: uuidv1(),
+                    status: 200,
+                    msg: "Updating data completed!"
+                })
             }
         }
     )
 });
 
 router.delete('/:id', auth, admin_restaurant, (req, res) => {
-    db.execute(
-        query.category_delete, [
-        req.params.id
-    ],
+    db.execute(`DELETE FROM categories WHERE id=?`, [req.params.id],
         (err, result, field) => {
-            console.log(err)
-            res.send({
-                "success": false,
-                "data": 'no such data'
-            });
+            if (err) {
+                console.log(err)
+                res.send({
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err,
+                })
+            } else {
+                res.send({
+                    uuid: uuidv1(),
+                    status: 200,
+                    msg: "Data Deletion completed!"
+                })
+            }
         }
     )
 })
-
-// app.post('/barang', async (req, res) => {
-//     const { kode_barang, nama_barang, kategori, harga_pokok, harga_distributor, harga_jual, stok } = req.body;
-
-//     const resData = await db.query(`INSERT INTO barang( kode_barang, nama_barang, kategori, harga_pokok, harga_jual, harga_distributor, sisa_stok) VALUES('${kode_barang}', '${nama_barang}', '${kategori}', '${harga_pokok}', '${harga_jual}', '${harga_distributor}', '${stok}')`, function (err, rows, fields) {
-//         console.log(err)
-//         res.json(rows);
-//     });
-// });
-
 
 module.exports = router;

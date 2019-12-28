@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const db = require('../config/config');
 const query = require('../model/query');
-const { auth, all, admin_restaurant, admin_customer, restaurant_customer, admin, restaurant, customer } = require('../config/middleware');
+const { auth, all, admin_restaurant } = require('../config/middleware');
 const { post_items } = require('../model/model');
 const multer = require('multer');
 const fs = require('fs');
+const uuidv1 = require('uuid/v1');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -19,68 +20,13 @@ const fileFilter = (req, file, callback) => {
     // accept image only
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/)) {
         return callback(new Error('Only image files are allowed!'), false);
+        // callback(null, false)
+    }else{
+        callback(null, true);
     }
-    callback(null, true);
 };
+
 const upload = multer({ storage: storage, fileFilter: fileFilter });
-
-router.post('/image/:id', auth, admin_restaurant, upload.single('image'), (req, res) => {
-    // try {
-    //   res.send(req.file);
-    // }catch(err) {
-    //   res.send(400);
-    // }
-    const sql = `UPDATE items SET images=? WHERE id=?`
-    db.execute(
-        sql, [req.file.filename, req.params.id],
-        (err, result, field) => {
-            console.log(err)
-            res.send({
-                "success": true,
-                "data": result
-            });
-        }
-    )
-});
-
-router.delete('/image/:id', auth, admin_restaurant, (req, res) => {
-    const sql = `SELECT images FROM items WHERE id=?`
-    db.execute(sql, [req.params.id], (err1, result1, field1) => {
-        console.log(err1);
-        if (err1) {
-            res.send('not found 1')
-        } else {
-            const image = ''
-            const del = `UPDATE items SET images=? WHERE id=?`
-            db.execute(del, [image, req.params.id], (err2, result2, field2) => {
-                if (err2) {
-                    console.log(err2)
-                    res.send('not found 2')
-                } else {
-                    if (!result1[0].images) {
-                        console.log('file not found')
-                        res.send('file not found')
-                    } else {
-                        fs.unlink(`./img/${result1[0].images}`, (err3) => {
-                            if (err3) {
-                                console.log(err3, result1)
-                                res.send(err3)
-                            } else {
-                                // if no error, file has been deleted successfully
-                                console.log('File deleted!');
-                                res.send({
-                                    "success": true,
-                                    "msg": 'file deleted'
-                                });
-                            }
-                        });
-                    }
-                }
-            })
-        }
-    })
-
-});
 
 router.get('/', auth, all, (req, res) => {
     if (req.query.page) {
@@ -88,38 +34,54 @@ router.get('/', auth, all, (req, res) => {
             if (req.query.sort) {
                 // res.send(req.query.sort)
                 if (req.query.page === '1') {
-                    page = 0
+                    page = 'LIMIT 5 OFFSET 0'
+                } else if (req.query.page === 'all') {
+                    page = ''
                 } else {
-                    page = (req.query.page) * 5
+                    offset = ((req.query.page) * 5) - 5
+                    page = `LIMIT 5 OFFSET ${offset}`
                 }
+
                 if (req.query.sort.name) {
                     sort_by = 'items.name';
-                    sort_met = req.query.sort.name;
+                    sort_con = req.query.sort.name;
                 } else if (req.query.sort.price) {
                     sort_by = 'items.price';
-                    sort_met = req.query.sort.price;
+                    sort_con = req.query.sort.price;
                 } else if (req.query.sort.date_updated) {
                     sort_by = 'items.date_updated';
-                    sort_met = req.query.sort.date_updated;
+                    sort_con = req.query.sort.date_updated;
+                } else if (req.query.sort.ratings) {
+                    sort_by = 'items.total_ratings';
+                    sort_con = req.query.sort.ratings;
+                } else {
+                    res.send('not valid')
                 }
-                // JANGAN LUPA RATINGS NYA BLOM CUYY
 
                 req.query.search.name ? name = `%${req.query.search.name}%` : name = '%%'
                 req.query.search.price ? price = `%${req.query.search.price}%` : price = '%%'
                 req.query.search.ratings ? ratings = `%${req.query.search.ratings}%` : ratings = '%%'
 
-                db.execute(`SELECT restaurants.name AS restaurant, items.name AS item, items.price, items.description, AVG(review.ratings) as ratings, items.images, items.date_created, items.date_updated, categories.name AS category, users.username AS created_by FROM items INNER JOIN categories ON items.category = categories.id INNER JOIN users ON items.created_by = users.id INNER JOIN restaurants ON items.restaurant = restaurants.id LEFT JOIN review ON review.item = items.id WHERE items.name LIKE '${name}' AND items.price LIKE '${price}' AND ratings LIKE '${ratings}'  GROUP BY items.name ORDER BY ${sort_by} ${sort_met} LIMIT 5 OFFSET ${page}`, (err, result, field) => {
-                    console.log(err);
-                    if (result.length === 0) {
+                db.execute(`SELECT items.name AS item, items.price, items.description, items.images, items.total_ratings, items.date_created, items.date_updated FROM items WHERE items.name LIKE ? AND items.price LIKE ? AND items.total_ratings LIKE ? GROUP BY items.name ORDER BY ${sort_by} ${sort_con} ${page}`, [name, price, ratings], (err, result, field) => {
+                    if (err) {
+                        console.log(err)
                         res.send({
-                            "success": false,
-                            "msg": 'no such data'
-                        });
+                            uuid: uuidv1(),
+                            status: 400,
+                            msg: err,
+                        })
+                    } else if (result.length === 0) {
+                        res.send({
+                            uuid: uuidv1(),
+                            status: 400,
+                            msg: "No data retrieved!",
+                        })
                     } else {
                         res.send({
-                            "success": true,
-                            "data": result
-                        });
+                            uuid: uuidv1(),
+                            status: 200,
+                            data: result
+                        })
                     }
                 })
             } else {
@@ -134,20 +96,29 @@ router.get('/', auth, all, (req, res) => {
                     offset = ((req.query.page) * 5) - 5
                     page = `LIMIT 5 OFFSET ${offset}`
                 }
-                db.execute(`${query.query_search_items} ${page}`, [name, price], (err, result, field) => {
-                    console.log(err);
-                    if (result.length === 0) {
-                        res.send({
-                            "success": false,
-                            "msg": 'no such data'
-                        });
-                    } else {
-                        res.send({
-                            "success": true,
-                            "data": result
-                        });
-                    }
-                })
+                db.execute(`${query.query_search_items} ${page}`,
+                    [name, price, ratings], (err, result, field) => {
+                        if (err) {
+                            console.log(err)
+                            res.send({
+                                uuid: uuidv1(),
+                                status: 400,
+                                msg: err,
+                            })
+                        } else if (result.length === 0) {
+                            res.send({
+                                uuid: uuidv1(),
+                                status: 400,
+                                msg: "No data retrieved!",
+                            })
+                        } else {
+                            res.send({
+                                uuid: uuidv1(),
+                                status: 200,
+                                data: result
+                            })
+                        }
+                    })
             }
         } else {
             if (req.query.page === '1') {
@@ -156,31 +127,60 @@ router.get('/', auth, all, (req, res) => {
                 page = ''
             } else {
                 offset = ((req.query.page) * 5) - 5
-                // DONT LIMIT BY 5 FOREVER
                 page = `LIMIT 5 OFFSET ${offset}`
             }
-            db.execute(`${query.query_get_items} ${page}`, [], (err, result, field) => {
-                console.log(err);
-                if (result.length === 0) {
-                    res.send({
-                        "success": false,
-                        "msg": 'no such data'
-                    });
-                } else {
-                    res.send({
-                        "success": true,
-                        "data": result
-                    });
-                }
-            })
+            db.execute(
+                `SELECT items.name AS item, items.price, items.description, items.images, items.total_ratings, items.date_created, items.date_updated FROM items GROUP BY items.name ${page}`
+                , [], (err, result, field) => {
+                    if (err) {
+                        console.log(err)
+                        res.send({
+                            uuid: uuidv1(),
+                            status: 400,
+                            msg: err,
+                        })
+                    } else if (result.length === 0) {
+                        res.send({
+                            uuid: uuidv1(),
+                            status: 400,
+                            msg: "No data retrieved!",
+                        })
+                    } else {
+                        res.send({
+                            uuid: uuidv1(),
+                            status: 200,
+                            data: result
+                        })
+                    }
+                })
         }
     } else {
         db.execute(`${query.query_get_items}`, [], (err, result, field) => {
-            console.log(err);
-            res.send({
-                "success": true,
-                "data": result
-            });
+            if (err) {
+                console.log(err)
+                res.send({
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err,
+                })
+            } else if (result.length === 0) {
+                res.send({
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: "No data retrieved!",
+                })
+            } else {
+                res.send({
+                    uuid: uuidv1(),
+                    status: 200,
+                    page: {
+                        limit: 5,
+                        total_data: result.length,
+                        total_page: Math.ceil((result.length) / 5)
+                    },
+                    data: result,
+                })
+            }
         })
     }
 });
@@ -188,35 +188,63 @@ router.get('/', auth, all, (req, res) => {
 router.get('/:id', auth, all, (req, res) => {
     const { id } = req.params;
 
-    const sql = `SELECT * FROM items WHERE id = ?`
+    const sql = `SELECT restaurants.name, items.name AS item, categories.name AS category, categories.id AS category_id, users.username AS created_by, items.price, items.description, items.total_ratings, items.images, items.date_created, items.date_updated FROM items INNER JOIN restaurants ON items.restaurant = restaurants.id INNER JOIN categories ON items.category = categories.id INNER JOIN users ON items.created_by = users.id WHERE items.id = ?`
     db.execute(
-        sql, [
-        id
-    ],
+        sql, [id],
         (err1, result1, field1) => {
             if (err1) {
                 console.log(err1)
                 res.send({
-                    "success": false,
-                    "msg": 'error'
-                });
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err1,
+                })
             } else {
-                const related = result1[0].category
-                const recommended = `SELECT * FROM items WHERE category = ? LIMIT 5`
+                const related = result1[0].category_id
+                const recommended = `SELECT restaurants.name, items.name AS item, categories.name AS category, categories.id AS category_id, users.username AS created_by, items.price, items.description, items.total_ratings, items.images, items.date_created, items.date_updated FROM items INNER JOIN restaurants ON items.restaurant = restaurants.id INNER JOIN categories ON items.category = categories.id INNER JOIN users ON items.created_by = users.id WHERE category = ? ORDER BY total_ratings DESC LIMIT 5`
 
                 db.execute(recommended, [related], (err2, result2, field2) => {
                     if (err2) {
                         console.log(err2)
                         res.send({
-                            "success": false,
-                            "msg": 'error'
-                        });
-                    } else {
+                            uuid: uuidv1(),
+                            status: 400,
+                            msg: err2,
+                        })
+                    } else if (result2.length === 0) {
                         res.send({
-                            "success": true,
-                            "data": result1,
-                            showcase: result2
-                        });
+                            uuid: uuidv1(),
+                            status: 400,
+                            msg: "No data retrieved!",
+                        })
+                    }
+                    else {
+                        const review = `SELECT review.review, users.username, items.name, review.ratings FROM review INNER JOIN users ON review.user = users.id INNER JOIN items ON review.item = items.id WHERE item = ? ORDER BY review.created_on DESC LIMIT 5`
+                        db.execute(review, [req.params.id], (err3, res3, field3) => {
+                            if (err3) {
+                                console.log(err2)
+                                res.send({
+                                    uuid: uuidv1(),
+                                    status: 400,
+                                    msg: err3,
+                                })
+                            } else if (res3.length === 0) {
+                                res.send({
+                                    uuid: uuidv1(),
+                                    status: 400,
+                                    msg: "No data retrieved!",
+                                })
+                            }
+                            else {
+                                res.send({
+                                    uuid: uuidv1(),
+                                    status: 200,
+                                    data: result1,
+                                    reviews: res3,
+                                    showcase: result2
+                                })
+                            }
+                        })
                     }
                 })
             }
@@ -224,63 +252,198 @@ router.get('/:id', auth, all, (req, res) => {
     )
 });
 
+router.post('/image/:id', auth, admin_restaurant, upload.single('image'), (req, res) => {
+    const { filename } = req.file
+    try {
+        const find = `SELECT images FROM items WHERE id = ?`
+        db.execute(find, [req.params.id], (err, result, field) => {
+            if (err) {
+                console.log(err)
+                res.send({
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err,
+                })
+            } else if (result.length === 0) {
+                res.send({
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: "No data retrieved!",
+                })
+            } else {
+                if (result[0].images) {
+                    fs.unlink(`./img/${result[0].images}`, (err3) => {
+                        if (err3) {
+                            console.log(err3)
+                            res.send({
+                                uuid: uuidv1(),
+                                status: 200,
+                                msg: err3
+                            })
+                        } else {
+                            const update = `UPDATE items SET images = ? WHERE id = ?`
+                            db.execute(update, [filename, req.params.id], (err4, res4, field4) => {
+                                if (err4) {
+                                    res.send({
+                                        uuid: uuidv1(),
+                                        status: 200,
+                                        msg: err3
+                                    })
+                                } else {
+                                    res.send({
+                                        uuid: uuidv1(),
+                                        status: 200,
+                                        msg: "Image uploaded!"
+                                    })
+                                }
+                            })
+                        }
+                    });
+                } else if (!result[0].images) {
+                    const sql = `UPDATE items SET images = ? WHERE id = ?`
+                    db.execute(sql, [filename, req.params.id], (err1, result1, field1) => {
+                        if (err1) {
+                            console.log(err1)
+                            res.send({
+                                uuid: uuidv1(),
+                                status: 400,
+                                msg: err1,
+                            })
+                        } else {
+                            res.send({
+                                uuid: uuidv1(),
+                                status: 200,
+                                msg: "Image uploaded!"
+                            })
+                        }
+                    })
+                }
+            }
+        })
+    } catch (error) {
+        res.send({
+            uuid: uuidv1(),
+            status: 400,
+            msg: error,
+        })
+    }
+})
+
 router.post('/', auth, admin_restaurant, (req, res) => {
 
-    const { restaurant, name, category, created_by, price, description, images } = req.body;
+    const { restaurant, name, category, created_by, price, description } = req.body;
     const date_created = new Date()
     const date_updated = new Date()
 
-    post_items(res, restaurant, name, category, created_by, price, description, images, date_created, date_updated)
+    post_items(
+        res, restaurant, name, category, created_by, price, description, date_created, date_updated
+    )
 });
 
 router.put('/:id', auth, admin_restaurant, (req, res) => {
-    const { restaurant, name, category, created_by, price, description, images } = req.body;
+    const { restaurant, name, category, created_by, price, description } = req.body;
     const date_updated = new Date()
+    const sql = sql = `UPDATE items SET restaurant=?, name=?, category=?, created_by=?, price=?, description=?, date_updated=? WHERE id=?`
 
-    db.execute(
-        query.query_update_items, [
-        restaurant, name, category, created_by, price, description, images, date_updated, req.params.id
-    ],
-        (err, result, field) => {
-            console.log(err)
-            res.send({
-                "success": true,
-                "data": result
-            });
-        }
-    )
+    try {
+        db.execute(
+            sql, [
+            restaurant, name, category, created_by, price, description, date_updated, req.params.id
+        ],
+            (err, result, field) => {
+                if (err) {
+                    console.log(err)
+                    res.send({
+                        uuid: uuidv1(),
+                        status: 400,
+                        msg: err,
+                    })
+                } else {
+                    res.send({
+                        uuid: uuidv1(),
+                        status: 200,
+                        msg: "Updating data completed!"
+                    })
+                }
+            }
+        )
+    } catch (error) {
+        res.send({
+            uuid: uuidv1(),
+            status: 400,
+            msg: error,
+        })
+    }
 });
 
 router.delete('/:id', auth, admin_restaurant, (req, res) => {
-    db.execute(
-        query.query_delete_items, [
-        req.params.id
-    ],
-        (err, result, field) => {
+    const sql = `SELECT images FROM items WHERE id = ?`
+    db.execute(sql, [req.params.id], (err, result, field) => {
+        if (err) {
             console.log(err)
-            if (result.affectedRows > 0) {
-                res.send({
-                    "success": true,
-                    "data": result
-                });
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
+        } else if (result.length === 0) {
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: 'Data not found!',
+            })
+        } else {
+            if (!result[0].images) {
+                const ready_del = `DELETE FROM items WHERE id = ?`
+                db.execute(ready_del, [req.params.id], (err2, res2, field2) => {
+                    if (err2) {
+                        console.log(err2)
+                        res.send({
+                            uuid: uuidv1(),
+                            status: 400,
+                            msg: err2,
+                        })
+                    } else {
+                        res.send({
+                            uuid: uuidv1(),
+                            status: 200,
+                            msg: "No image detected. Data Deletion completed!"
+                        })
+                    }
+                })
             } else {
-                res.send({
-                    "success": false,
-                    "msg": 'no such data'
-                });
+                const ready_del = `DELETE FROM items WHERE id = ?`
+                db.execute(ready_del, [req.params.id], (err2, res2, field2) => {
+                    if (err2) {
+                        console.log(err2)
+                        res.send({
+                            uuid: uuidv1(),
+                            status: 400,
+                            msg: err2,
+                        })
+                    } else {
+                        fs.unlink(`./img/${result[0].images}`, (err3) => {
+                            if (err3) {
+                                console.log(err3)
+                                res.send({
+                                    uuid: uuidv1(),
+                                    status: 200,
+                                    msg: "No image detected. Data Deletion completed!"
+                                })
+                            } else {
+                                // if no error, file has been deleted successfully
+                                res.send({
+                                    uuid: uuidv1(),
+                                    status: 200,
+                                    msg: "Data Deletion completed!"
+                                })
+                            }
+                        });
+                    }
+                })
             }
         }
-    )
+    })
 });
-
-// app.post('/barang', async (req, res) => {
-//     const { kode_barang, nama_barang, kategori, harga_pokok, harga_distributor, harga_jual, stok } = req.body;
-
-//     const resData = await db.query(`INSERT INTO barang( kode_barang, nama_barang, kategori, harga_pokok, harga_jual, harga_distributor, sisa_stok) VALUES('${kode_barang}', '${nama_barang}', '${kategori}', '${harga_pokok}', '${harga_jual}', '${harga_distributor}', '${stok}')`, function (err, rows, fields) {
-//         console.log(err)
-//         res.json(rows);
-//     });
-// });
-
 
 module.exports = router;

@@ -13,7 +13,7 @@ const auth = (req, res, next) => {
                 res.send('error')
             } else {
                 if (result.length === 0) {
-                    res.send({ success: false, msg: 'Please login!' })
+                    res.send({ success: false, msg: 'False token!' })
                 } else if (result[0].signed_out === 'true') {
                     res.send({ success: false, msg: 'Please login!' })
                 } else {

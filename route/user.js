@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../config/config');
 const secret = process.env.APP_KEY;
-const { auth, all, admin_restaurant, admin_customer, restaurant_customer, admin, restaurant, customer } = require('../config/middleware');
+const { auth, admin } = require('../config/middleware');
+const uuidv1 = require('uuid/v1');
 
 require('dotenv').config();
 
@@ -13,7 +14,7 @@ router.post('/login', (req, res) => {
     db.execute(user, [username], (err, result, field) => {
         if (result.length > 0) {
             if (bcrypt.compareSync(password, result[0].password)) {
-                const auth = jwt.sign({ username: username }, secret);
+                const auth = jwt.sign({ username: username, expiresIn: 3600 }, secret);
                 // username:username SAMA AJA DENGAN username
                 const signed_out = 'false'
                 const signed = `INSERT INTO revoked_tokens(token, signed_out) VALUES(?, ?)`
@@ -47,7 +48,26 @@ router.post('/login', (req, res) => {
 
 router.get('/', auth, admin, (req, res) => {
     db.execute(`SELECT * FROM users`, [], (err, result, field) => {
-        res.send(result);
+        if (err) {
+            console.log(err)
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
+        } else if (result.length === 0) {
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: "No data retrieved!",
+            })
+        } else {
+            res.send({
+                uuid: uuidv1(),
+                status: 200,
+                data: result
+            })
+        }
     })
 });
 
@@ -55,12 +75,31 @@ router.get('/:id', auth, admin, (req, res) => {
     const { id } = req.params;
     const sql = 'SELECT * FROM users WHERE id = ?'
     db.execute(sql, [id], (err, result, field) => {
-        res.send({ success: true, data: result[0] })
+        if (err) {
+            console.log(err)
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
+        } else if (result.length === 0) {
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: "No data retrieved!",
+            })
+        } else {
+            res.send({
+                uuid: uuidv1(),
+                status: 200,
+                data: result
+            })
+        }
     })
 });
 
-router.post('/', (req, res) => {
-    const { username, password, roles } = req.body;
+router.post('/restaurant', auth, admin, (req, res) => {
+    const { username, password } = req.body;
     const enc = bcrypt.hashSync(password)
     const created_on = new Date();
     const updated_on = new Date();
@@ -68,14 +107,53 @@ router.post('/', (req, res) => {
 
     db.execute(
         sql, [
-        username, enc, roles, created_on, updated_on
+        username, enc, 2, created_on, updated_on
     ],
         (err, result, field) => {
-            console.log(err)
-            res.send({
-                success: true,
-                msg: 'User created'
-            })
+            if (err) {
+                console.log(err)
+                res.send({
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err,
+                })
+            } else {
+                res.send({
+                    uuid: uuidv1(),
+                    status: 200,
+                    msg: "Data insertion completed!"
+                })
+            }
+        }
+    );
+});
+
+router.post('/customer', auth, admin, (req, res) => {
+    const { username, password } = req.body;
+    const enc = bcrypt.hashSync(password)
+    const created_on = new Date();
+    const updated_on = new Date();
+    const sql = 'INSERT INTO users (username, password, roles, created_on, updated_on ) VALUES(?,?,?,?,?)';
+
+    db.execute(
+        sql, [
+        username, enc, 3, created_on, updated_on
+    ],
+        (err, result, field) => {
+            if (err) {
+                console.log(err)
+                res.send({
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err,
+                })
+            } else {
+                res.send({
+                    uuid: uuidv1(),
+                    status: 200,
+                    msg: "Data insertion completed!"
+                })
+            }
         }
     );
 });
@@ -91,11 +169,20 @@ router.put('/:id', auth, admin, (req, res) => {
         username, enc, roles, updated_on, req.params.id
     ],
         (err, result, field) => {
-            console.log(err)
-            res.send({
-                success: true,
-                msg: 'User updated'
-            })
+            if (err) {
+                console.log(err)
+                res.send({
+                    uuid: uuidv1(),
+                    status: 400,
+                    msg: err,
+                })
+            } else {
+                res.send({
+                    uuid: uuidv1(),
+                    status: 200,
+                    msg: "Updating data completed!"
+                })
+            }
         }
     );
 });
@@ -108,9 +195,17 @@ router.delete('/logout', auth, (req, res) => {
     db.execute(`UPDATE revoked_tokens SET signed_out = '${signed_out}' WHERE token = '${jwt_token}'`, (err, result, field) => {
         if (err) {
             console.log(err)
-            res.send('error')
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
         } else {
-            res.send('signed out')
+            res.send({
+                uuid: uuidv1(),
+                status: 200,
+                msg: "Signed out!"
+            })
         }
     })
 

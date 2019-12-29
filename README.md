@@ -91,7 +91,7 @@ DB_DATABASE=food_deliv
 **4. DELETE**
 * `/user/logout` (invalidate login token)
 * `/user/:id` (Delete account by id)
-* `/restaurants/:id` (Get restaurants by id)
+* `/restaurants/:id` (Delete restaurants by id)
 * `/categories/:id` (Delete categories by id)
 * `/items/:id` (Delete item by id)
 * `/carts/:id` (Delete cart by id)

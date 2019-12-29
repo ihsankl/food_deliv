@@ -38,6 +38,8 @@ DB_DATABASE=food_deliv
 
 ## End Point
 **1. GET**
+* `/user/`
+* `/user/:id` (Get user by id)
 * `/restaurants`
 * `/restaurants/:id` (Get restaurants by id)
 * `/items` 
@@ -50,13 +52,13 @@ DB_DATABASE=food_deliv
 * `/carts/:id` (Get cart by id)
 * `/review/`
 * `/review/:id` (Get review by id)
-* `/user/`
-* `/user/:id` (Get user by id)
 
 **2. POST**
 * `/user/restaurant` (Register new account for restaurant owner)
     * ``` { "username":"ihsankl", "password":"somestrongpassword" } ```
-* `/user/restaurant` (Register new account for customer)
+* `/user/customer` (Register new account for customer)
+    * ``` { "username":"iamcustomer", "password":"somestrongpassword" } ```
+* `/user/login` (Get a new token for auth)
     * ``` { "username":"iamcustomer", "password":"somestrongpassword" } ```
 * `/restaurants`
     * ``` { "name":"Restoran Padang", "user":"1", "location":"(-0.928905, 100.367287)", "description":"Lorem Ipsum" } ```

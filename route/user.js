@@ -192,7 +192,7 @@ router.delete('/logout', auth, (req, res) => {
     const signed_out = 'true'
     const sql = `UPDATE revoked_tokens SET signed_out = ? WHERE token = ?`
 
-    db.execute(`UPDATE revoked_tokens SET signed_out = '${signed_out}' WHERE token = '${jwt_token}'`, (err, result, field) => {
+    db.execute(sql, [signed_out, jwt_token], (err, result, field) => {
         if (err) {
             console.log(err)
             res.send({
@@ -205,6 +205,28 @@ router.delete('/logout', auth, (req, res) => {
                 uuid: uuidv1(),
                 status: 200,
                 msg: "Signed out!"
+            })
+        }
+    })
+
+});
+
+router.delete('/:id', auth, admin, (req, res) => {
+    const sql = `DELETE users WHERE id = ?`
+
+    db.execute(sql, [req.params.id], (err, result, field) => {
+        if (err) {
+            console.log(err)
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
+        } else {
+            res.send({
+                uuid: uuidv1(),
+                status: 200,
+                msg: "Account deleted!"
             })
         }
     })

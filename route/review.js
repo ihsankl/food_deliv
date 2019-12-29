@@ -28,6 +28,32 @@ router.get('/', auth, all, (req, res) => {
     })
 });
 
+router.get('/:id', auth, all, (req, res) => {
+    const { id } = req.params
+    db.execute(`SELECT review.review, users.username, items.name, review.ratings, review.created_on, review.updated_on FROM review INNER JOIN users ON review.user = users.id INNER JOIN items ON review.item = items.id WHERE review.id = ?`, [id], (err, result, field) => {
+        if (err) {
+            console.log(err)
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
+        } else if (result.length === 0) {
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: "No data retrieved!",
+            })
+        } else {
+            res.send({
+                uuid: uuidv1(),
+                status: 200,
+                data: result
+            })
+        }
+    })
+});
+
 router.post('/', auth, all, (req, res) => {
     const { review, user, item, ratings } = req.body;
     const created_on = new Date()

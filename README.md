@@ -1,9 +1,8 @@
-<h1 align="center">ExpressJS - Simple Notes App RESTfull API</h1>
+<h1 align="center">ExpressJS - Simple Food Delivery App RESTfull API</h1>
 
 
 
-Note App is a simple note application specially for backend only. Built with NodeJs using the ExpressJs Framework.
-Express.js is a web application framework for Node.js. [More about Express](https://en.wikipedia.org/wiki/Express.js)
+"Food deliv" is a simple express js application that can be used as a backend.. [More about Express](https://en.wikipedia.org/wiki/Express.js)
 ## Built With
 [![Express.js](https://img.shields.io/badge/Express.js-4.x-orange.svg?style=rounded-square)](https://expressjs.com/en/starter/installing.html)
 [![Node.js](https://img.shields.io/badge/Node.js-v.10.16-green.svg?style=rounded-square)](https://nodejs.org/)
@@ -27,37 +26,71 @@ Express.js is a web application framework for Node.js. [More about Express](http
 ## Set up .env file
 Open .env file on your favorite code editor, and copy paste this code below :
 ```
-PORT=3000
-HOST=localhost
-USER=root // default
-PASS= // default
-DATABASE=note
-NODE_ENV=development node server.js
+APP_PORT=3001
+APP_URI=http://localhost:3001/
+APP_KEY=ininamanyasecretbaru
+
+DB_SERVER=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_DATABASE=food_deliv
 ```
 
 ## End Point
 **1. GET**
-* `/notes`
-* `/notes?search=lorem&sort=ASC&limit=5&page=1`
-* `/note/:id` (Get note by id)
+* `/restaurants`
+* `/restaurants/:id` (Get restaurants by id)
+* `/items` 
+* `/items?items?page=all&search[name]=angel cake&sort[ratings]=asc`
+* `/items/:id` (Get item by id)
 * `/categories`
-* `/categories?search=Diary`
-* `/category/:id` (Get category by id)
-
+* `/categories/:id` (Get category by id)
+* `/carts/`
+* `/carts/user/1` (Get carts by user id)
+* `/carts/:id` (Get cart by id)
+* `/review/`
+* `/review/:id` (Get review by id)
+* `/user/`
+* `/user/:id` (Get user by id)
 
 **2. POST**
-* `/note`
-    * ``` { "title": "Party", "note": "Herman's Party at 19.00", "category": 1 } ```
+* `/user/restaurant` (Register new account for restaurant owner)
+    * ``` { "username":"ihsankl", "password":"somestrongpassword" } ```
+* `/user/restaurant` (Register new account for customer)
+    * ``` { "username":"iamcustomer", "password":"somestrongpassword" } ```
+* `/restaurants`
+    * ``` { "name":"Restoran Padang", "user":"1", "location":"(-0.928905, 100.367287)", "description":"Lorem Ipsum" } ```
+* `/restaurants/logo/:id` (Upload logo for designated restaurant id)
+* `/items`
+    * ``` { "restaurant": "1", "name": "Baumkuchen", "category": 1, "created_by":"1", "price":"5000", "description":"lorem ipsum" } ```
+* `/items/image/:id` (Upload image for designated item id)
+* `/categories`
+    * ``` { "name":"Cake" } ```
+* `/carts`
+    * ``` { "user":"1", "restaurant":"Restoran Tanah Abang", "item":"Angel Cake", "qty":"1", "bought":"false" } ```
+* `/review/`
+    * ``` { "review":"Lorem Ipsum", "user":"1", "item":"1", "ratings":"5" } ```
 
-* `/category`
-    * ``` { "categoryName": "Category6" } ```
 
-**3. PATCH**
-* `/note/:id` (Update note by id)
-   * ``` { "title": "Party", "note": "Herman's Party at 18.00", "category": 2 } ```
-* `/category/:id` (Update category by id)
-   * ``` { "categoryName": "Category8" } ```
+**3. PUT**
+* `/user/:id` (Update account info by id)
+    * ``` { "username":"ihsankl", "password":"somestrongpassword" } ```
+* `/restaurants/:id` (Update restaurant by id)
+    * ``` { "name":"Restoran Tanah Abang", "user":"1", "location":"(-0.928905, 100.367287)", "description":"Lorem Ipsum" } ```
+* `/categories/:id` (Update category by id)
+    * ``` { "name":"Sweets" } ```
+* `/items/:id` (Update item by id)
+  * ``` { "restaurant": "1", "name": "Baumkuchen", "category": 1, "created_by":"1", "price":"5000", "description":"lorem ipsum" } ```
+* `/carts/:id` (Update cart by id)
+    * ``` { "user":"1", "restaurant":"Restoran Tanah Abang", "item":"Angel Cake", "qty":"1", "bought":"true" } ```
+* `/review/:id` (Update review by id)
+    * ``` { "review":"Ipsum Lorem", "user":"1", "item":"1", "ratings":"4" } ```
 
 **4. DELETE**
-* `/note/:id` (Delete note by id)
-* `/category/:id` (Delete category by id)
+* `/user/logout` (invalidate login token)
+* `/user/:id` (Delete account by id)
+* `/restaurants/:id` (Get restaurants by id)
+* `/categories/:id` (Delete categories by id)
+* `/items/:id` (Delete item by id)
+* `/carts/:id` (Delete cart by id)
+* `/review/:id` (Delete review by id)

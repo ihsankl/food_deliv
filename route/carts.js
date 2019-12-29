@@ -3,9 +3,34 @@ const db = require('../config/config');
 const { auth, all } = require('../config/middleware');
 const uuidv1 = require('uuid/v1');
 
+router.get('/user/:id', auth, all, (req, res) => {
+    const { id } = req.params
+    db.execute(`SELECT * FROM carts WHERE user = ?`, [id], (err, result, field) => {
+        if (err) {
+            console.log(err)
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: err,
+            })
+        } else if (result.length === 0) {
+            res.send({
+                uuid: uuidv1(),
+                status: 400,
+                msg: "No data retrieved!",
+            })
+        } else {
+            res.send({
+                uuid: uuidv1(),
+                status: 200,
+                data: result
+            })
+        }
+    })
+});
+
 router.get('/', auth, all, (req, res) => {
-    const { user } = req.query
-    db.execute(`SELECT * FROM carts WHERE user = ?`, [user], (err, result, field) => {
+    db.execute(`SELECT * FROM carts`, [], (err, result, field) => {
         if (err) {
             console.log(err)
             res.send({

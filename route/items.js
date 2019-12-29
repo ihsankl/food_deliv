@@ -219,7 +219,7 @@ router.get('/:id', auth, all, (req, res) => {
                         })
                     }
                     else {
-                        const review = `SELECT review.review, users.username, items.name, review.ratings FROM review INNER JOIN users ON review.user = users.id INNER JOIN items ON review.item = items.id WHERE item = ? ORDER BY review.created_on DESC LIMIT 5`
+                        const review = `SELECT review.review, users.username, items.name, review.ratings FROM review INNER JOIN users ON review.user = users.id INNER JOIN items ON review.item = items.id WHERE item = ? ORDER BY review.updated_on DESC LIMIT 5`
                         db.execute(review, [req.params.id], (err3, res3, field3) => {
                             if (err3) {
                                 console.log(err2)

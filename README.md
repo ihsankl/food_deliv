@@ -28,7 +28,7 @@ Open .env file on your favorite code editor, and copy paste this code below :
 ```
 APP_PORT=3001
 APP_URI=http://localhost:3001/
-APP_KEY=ininamanyasecretbaru
+APP_KEY=thisisaverysecretword
 
 DB_SERVER=localhost
 DB_USER=root

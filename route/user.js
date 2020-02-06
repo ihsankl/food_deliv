@@ -255,7 +255,7 @@ router.delete('/:id', auth, (req, res) => {
   });
 });
 
-router.put('/forgot_pass/:id', auth, (req, res) => {
+router.put('/forgot_pass/:id', (req, res) => {
   const userId = req.params.id;
 
   function makeid(length) {

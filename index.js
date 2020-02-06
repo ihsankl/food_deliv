@@ -1,5 +1,6 @@
-require('dotenv').config()
+require('dotenv').config();
 const Express = require('express');
+
 const app = Express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -9,7 +10,7 @@ const restaurants = require('./route/restaurants');
 const carts = require('./route/carts');
 const review = require('./route/review');
 const categories = require('./route/categories');
-const query = require('./model/query')
+const query = require('./model/query');
 // const { auth } = require('./src/middleware');
 const port = process.env.APP_PORT;
 
@@ -27,22 +28,16 @@ app.use('/carts', carts);
 app.use('/review', review);
 // app.use('/restaurants', auth, restaurants)
 app.use('/restaurants', restaurants);
-app.use('/user', user)
+app.use('/user', user);
 
 app.get('/', (req, res) => {
-    res.send('App worked out');
-});
-
-app.get('/tes', (req, res) => {
-    // { color: ['black', 'yellow'], 'shoe[color]': 'white' }
-    console.log(query)
-
+  res.send('App worked out');
 });
 
 app.post('/', (req, res) => {
-    res.send(req.body);
+  res.send(req.body);
 });
 
 app.listen(port, () => {
-    console.log(`app listening on port ${port}`);
+  console.log(`app listening on port ${port}`);
 });

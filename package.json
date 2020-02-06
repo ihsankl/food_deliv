@@ -10,10 +10,15 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",
+    "mysql": "^2.17.1",
     "mysql2": "^2.0.2",
     "uuid": "^3.3.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1"
+  },
   "scripts": {
     "test": "nodemon index"
   },

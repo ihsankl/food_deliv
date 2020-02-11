@@ -19,10 +19,10 @@ const sql = require('../model/restaurants');
 // };
 
 const storage = multer.diskStorage({
-  destination(cb) {
+  destination(req, file, cb) {
     cb(null, './logo');
   },
-  filename(file, cb) {
+  filename(req, file, cb) {
     cb(null, file.originalname);
   },
 });

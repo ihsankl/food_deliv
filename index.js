@@ -10,7 +10,6 @@ const restaurants = require('./route/restaurants');
 const carts = require('./route/carts');
 const review = require('./route/review');
 const categories = require('./route/categories');
-const query = require('./model/query');
 // const { auth } = require('./src/middleware');
 const port = process.env.APP_PORT;
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 19, 2020 at 12:38 PM
+-- Generation Time: Feb 06, 2020 at 12:01 PM
 -- Server version: 10.4.10-MariaDB
 -- PHP Version: 7.1.33
 
@@ -59,7 +59,10 @@ INSERT INTO `carts` (`id`, `user`, `restaurant`, `item`, `qty`, `price`, `total`
 (132, 3, 'Restoran Padang', 'Coppenrath & Wiese', 1, 6000, '6000', 'true'),
 (134, 3, 'Restoran Padang', 'Coppenrath & Wiese', 4, 6000, '24000', 'true'),
 (135, 3, 'Restoran Padang', 'Coppenrath & Wiese', 2, 6000, '12000', 'true'),
-(136, 3, 'rumah makan sini aja', 'Entenmann\'s ', 1, 6000, '6000', 'true');
+(136, 3, 'rumah makan sini aja', 'Entenmann\'s ', 1, 6000, '6000', 'true'),
+(144, 3, 'Restoran Padang', 'Coppenrath & Wiese', 1, 6000, '6000', 'true'),
+(145, 3, 'Restoran Padang', 'Coppenrath & Wiese', 1, 6000, '6000', 'true'),
+(146, 3, 'Restoran Padang', 'Coppenrath & Wiese', 1, 6000, '6000', 'true');
 
 -- --------------------------------------------------------
 
@@ -242,7 +245,20 @@ INSERT INTO `revoked_tokens` (`id`, `token`, `signed_out`) VALUES
 (22, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3ODgwMjQzMX0.8HlpFytL7e9ssQuh_casMk9DwNtoWWYnJYNtQ9_KfDM', 'false'),
 (23, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3ODg0NzQ1OH0.qL1QO1Q1A6GX2vtB5anHTkpXIBXN4vGNc47PjfdtAkA', 'true'),
 (24, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3ODg5NTk3Nn0.D6ExuecpzK8cIRvZNbR8T0Ra36ecuX4lUO9FCUtbtjU', 'true'),
-(25, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3ODg5NjEzNn0.Lbehw5jTlIOyLE-yg27Ohu_PBvAtNXec_9Y6PLpyU0A', 'false');
+(25, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3ODg5NjEzNn0.Lbehw5jTlIOyLE-yg27Ohu_PBvAtNXec_9Y6PLpyU0A', 'false'),
+(26, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3OTQ2NDY4N30.r7bDX7HpE1tgyaJLRsdOTOBsogLp-XjkMzRQyew2Av8', 'false'),
+(27, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJTb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3OTQ2NjY2MX0.gPisy7gWGIYVx2F-bqNvg0QmVDhsbvpwe-hb_H7CaNk', 'false'),
+(28, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJTb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3OTQ2NzQzOX0.4B0BboA_Olq139k1PyNXaMpCYWmblN69CJyOoMamh-E', 'false'),
+(29, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJTb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3OTQ3MjI1NH0._e0WmkASLut2Q-FMHaR49PVso04ZNXEmitGowXp8MN8', 'false'),
+(30, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3OTQ5MzIxMH0.wweTo-f_Tu0I5Y685oGnYGOQwzGtHzfBRP2-jrn_o8Q', 'false'),
+(31, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU3OTQ5NDcxOX0.Kz0RHX0HFjW8VssdNl6JHxUwMcgVEkt9D6gz3edLNMc', 'false'),
+(32, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJpaHNhbmtsIiwicm9sZXMiOjEsImV4cGlyZXNJbiI6IjFoIiwiaWF0IjoxNTgwODg5NDQ2fQ.iuehYoDho9FGw8jOgoVm3eKAzmwt4E_rILu0eOWVzyE', 'false'),
+(33, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJpaHNhbmtsIiwicm9sZXMiOjEsImV4cGlyZXNJbiI6IjFoIiwiaWF0IjoxNTgwODkxMjEzfQ.jYMivLIbGqrIEhv578x9uVxwcdEfH4wE-4f237RnO3A', 'false'),
+(34, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU4MDg5MTIzNX0.afBOALp20ZmVtLQiOY2OuBJBTdk2j8zQqnkCKPXKV_c', 'false'),
+(35, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlciIsInJvbGVzIjoyLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU4MDg5MTI0NH0.2fqGdB_hN4gkC_CsdZvTUA_rdU-xYN3Km_JsvW9DAqE', 'false'),
+(36, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsInVzZXJuYW1lIjoiZWFuIiwicm9sZXMiOjIsImV4cGlyZXNJbiI6IjFoIiwiaWF0IjoxNTgwODkxMzA5fQ.47aMTs2CcLGB80vbcoewxhHKGdWL7xT3ubOjZlXlDJk', 'false'),
+(37, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJpaHNhbmtsIiwicm9sZXMiOjEsImV4cGlyZXNJbiI6IjFoIiwiaWF0IjoxNTgwODkxNjk4fQ.WZMQrsg75QisT7E-1q4QAGkDLBr2W-ZaFOBCM_fg8fI', 'false'),
+(38, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsInVzZXJuYW1lIjoiZWFuMSIsInJvbGVzIjozLCJleHBpcmVzSW4iOiIxaCIsImlhdCI6MTU4MDk4MzM0Nn0.dzMpKpJfZrNBiuRmKbUDMmsdqgUr7o_dJ7By01qZkwE', 'false');
 
 -- --------------------------------------------------------
 
@@ -288,7 +304,9 @@ INSERT INTO `users` (`id`, `username`, `password`, `roles`, `created_on`, `updat
 (2, 'ihsankl', '$2a$10$f/eKSjvuxaleZ35Kec9ObeUQch29Yq7x0nTD7LWtGjPphDE58M3J6', 1, '2019-12-24 08:57:35', '2019-12-24 09:03:32'),
 (3, 'someuser', '$2a$10$2G0Ry4lOJfPHXDVgsdOScOh29Gj0ywv/Nwe12kdiBXcTL1vM.ia1e', 2, '2019-12-30 03:25:00', '2019-12-30 03:25:00'),
 (4, 'asdasd', '$2a$10$zi7tfJ6caMlqOyl9HMrlw.OcZpz.jW1c12oRjs19S1EUVqKgBRsLq', 3, '2020-01-06 02:41:48', '2020-01-06 02:41:48'),
-(5, 'arkademy', '$2a$10$yEiuk1wj8A2NVOFcHoE73uHrObHgKvh0ykwXcjd6UJIcqW1ZZYvym', 3, '2020-01-06 03:25:36', '2020-01-06 03:25:36');
+(5, 'arkademy', '$2a$10$yEiuk1wj8A2NVOFcHoE73uHrObHgKvh0ykwXcjd6UJIcqW1ZZYvym', 3, '2020-01-06 03:25:36', '2020-01-06 03:25:36'),
+(10, 'ihsan', '$2a$10$NSZdbOG5W4lrhEDNwhX6qu75N/jJRALVAq01KsGnGqRCO1hSGMxVm', 2, '2020-02-05 07:20:49', '2020-02-05 07:20:49'),
+(14, 'ean1', '$2a$10$aU5J6fsl7S0XKYDamHSyweLb2Ab1T7dqRX1WnqCWA1XneYgAFmRVm', 3, '2020-02-06 09:55:05', '2020-02-06 10:28:54');
 
 --
 -- Indexes for dumped tables
@@ -358,7 +376,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -388,7 +406,7 @@ ALTER TABLE `review`
 -- AUTO_INCREMENT for table `revoked_tokens`
 --
 ALTER TABLE `revoked_tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -400,7 +418,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- Constraints for dumped tables

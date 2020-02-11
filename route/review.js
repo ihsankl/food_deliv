@@ -31,7 +31,7 @@ router.get('/', auth, all, (req, res) => {
 
 router.get('/user/:id', auth, all, (req, res) => {
   // #1
-  db.execute(sql.get, [req.params.id], (err, result) => {
+  db.execute(sql.detailWithUser, [req.params.id], (err, result) => {
     if (err) {
       res.send({
         uuid: uuidv1(),

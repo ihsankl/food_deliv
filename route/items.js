@@ -224,6 +224,22 @@ router.post('/image/:id', auth, admin_restaurant, upload.single('image'), (req, 
           status: 400,
           msg: 'No data retrieved!',
         });
+      } else if (result[0].images === 'noimage.jpg') {
+        db.execute(sql.updateImage, [filename, req.params.id], (errrr) => {
+          if (errrr) {
+            res.send({
+              uuid: uuidv1(),
+              status: 200,
+              msg: errrr,
+            });
+          } else {
+            res.send({
+              uuid: uuidv1(),
+              status: 200,
+              msg: 'Image uploaded!',
+            });
+          }
+        });
       } else if (result[0].images) {
         fs.unlink(`./img/${result[0].images}`, (err3) => {
           if (err3) {
@@ -233,13 +249,12 @@ router.post('/image/:id', auth, admin_restaurant, upload.single('image'), (req, 
               msg: err3,
             });
           } else {
-            // const update = 'UPDATE items SET images = ? WHERE id = ?';
             db.execute(sql.updateImage, [filename, req.params.id], (err4) => {
               if (err4) {
                 res.send({
                   uuid: uuidv1(),
                   status: 200,
-                  msg: err3,
+                  msg: err4,
                 });
               } else {
                 res.send({
@@ -252,7 +267,6 @@ router.post('/image/:id', auth, admin_restaurant, upload.single('image'), (req, 
           }
         });
       } else if (!result[0].images) {
-        // const sql = 'UPDATE items SET images = ? WHERE id = ?';
         db.execute(sql.updateImage, [filename, req.params.id], (err1) => {
           if (err1) {
             res.send({
@@ -300,8 +314,8 @@ router.put('/:id', auth, admin_restaurant, (req, res) => {
   try {
     db.execute(
       sql.update, [
-        restaurant, name, category, created_by, price, description, dateUpdated, req.params.id,
-      ],
+      restaurant, name, category, created_by, price, description, dateUpdated, req.params.id,
+    ],
       (err) => {
         if (err) {
           res.send({

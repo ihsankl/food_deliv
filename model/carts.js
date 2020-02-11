@@ -1,7 +1,7 @@
 const carts = {
-  notBought: `SELECT carts.*, items.id as itemID FROM carts LEFT JOIN items ON items.name = carts.item
+  notBought: `SELECT carts.*, items.id as itemID, items.images FROM carts LEFT JOIN items ON items.name = carts.item
       WHERE user = ? AND bought = 'false'`,
-  bought: `SELECT carts.*, items.id as itemID FROM carts LEFT JOIN items ON items.name = carts.item
+  bought: `SELECT carts.*, items.id as itemID, items.images FROM carts LEFT JOIN items ON items.name = carts.item
       WHERE user = ? AND bought = 'true'`,
   get: 'SELECT * FROM carts',
   detail: 'SELECT * FROM carts WHERE id = ?',

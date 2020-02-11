@@ -11,10 +11,10 @@ const url = process.env.APP_URI;
 
 
 const storage = multer.diskStorage({
-  destination(cb) {
+  destination(req, file, cb) {
     cb(null, './img');
   },
-  filename(file, cb) {
+  filename(req, file, cb) {
     cb(null, file.originalname);
   },
 });
@@ -211,7 +211,7 @@ router.get('/:id', (req, res) => {
 router.post('/image/:id', auth, admin_restaurant, upload.single('image'), (req, res) => {
   const { filename } = req.file;
   try {
-    db.execute(sql.findImages, [req.params.id], (err, result) => {
+    db.execute(sql.findImage, [req.params.id], (err, result) => {
       if (err) {
         res.send({
           uuid: uuidv1(),

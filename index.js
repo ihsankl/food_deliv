@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Express = require('express');
+const path = require('path');
 
 const app = Express();
 const cors = require('cors');
@@ -17,7 +18,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.set('query parser', 'simple');
-// app.use('/items', auth, items)
+app.use('/images', Express.static(path.join(__dirname, 'img')));// app.use('/items', auth, items)
 app.use('/items', items);
 // app.use('/categories', auth, categories);
 app.use('/categories', categories);

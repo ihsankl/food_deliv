@@ -149,13 +149,12 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
-  const sql = 'SELECT restaurants.name, items.name AS item, items.id, categories.name AS category, categories.id AS category_id, users.username AS created_by, items.price, items.description, items.total_ratings, items.images, items.date_created, items.date_updated FROM items INNER JOIN restaurants ON items.restaurant = restaurants.id INNER JOIN categories ON items.category = categories.id INNER JOIN users ON items.created_by = users.id WHERE items.id = ?';
+  // const sql = 'SELECT restaurants.name, items.name AS item, items.id, categories.name AS category, categories.id AS category_id, users.username AS created_by, items.price, items.description, items.total_ratings, items.images, items.date_created, items.date_updated FROM items INNER JOIN restaurants ON items.restaurant = restaurants.id INNER JOIN categories ON items.category = categories.id INNER JOIN users ON items.created_by = users.id WHERE items.id = ?';
 
   db.execute(
-    sql, [id],
+    sql.detail, [id],
     (err1, result1) => {
       if (err1) {
-        console.log(err1);
         res.send({
           uuid: uuidv1(),
           status: 400,
@@ -169,23 +168,21 @@ router.get('/:id', (req, res) => {
         });
       } else {
         const related = result1[0].category_id;
-        const recommended = `SELECT restaurants.name, items.name AS item, categories.name AS category, categories.id AS category_id, users.username AS created_by, items.price, items.description, items.total_ratings, items.images, items.date_created, items.date_updated 
-                FROM items INNER JOIN restaurants ON items.restaurant = restaurants.id INNER JOIN categories ON items.category = categories.id INNER JOIN users ON items.created_by = users.id 
-                WHERE category = ? ORDER BY total_ratings DESC LIMIT 3`;
+        // const recommended = `SELECT restaurants.name, items.name AS item, categories.name AS category, categories.id AS category_id, users.username AS created_by, items.price, items.description, items.total_ratings, items.images, items.date_created, items.date_updated 
+        //         FROM items INNER JOIN restaurants ON items.restaurant = restaurants.id INNER JOIN categories ON items.category = categories.id INNER JOIN users ON items.created_by = users.id 
+        //         WHERE category = ? ORDER BY total_ratings DESC LIMIT 3`;
 
-        db.execute(recommended, [related], (err2, result2) => {
+        db.execute(sql.recommended, [related], (err2, result2) => {
           if (err2) {
-            console.log(err2);
             res.send({
               uuid: uuidv1(),
               status: 400,
               msg: err2,
             });
           } else {
-            const review = 'SELECT review.review, users.username, items.name, review.ratings FROM review INNER JOIN users ON review.user = users.id INNER JOIN items ON review.item = items.id WHERE item = ? ORDER BY review.updated_on DESC LIMIT 5';
-            db.execute(review, [req.params.id], (err3, res3) => {
+            // const review = 'SELECT review.review, users.username, items.name, review.ratings FROM review INNER JOIN users ON review.user = users.id INNER JOIN items ON review.item = items.id WHERE item = ? ORDER BY review.updated_on DESC LIMIT 5';
+            db.execute(sql.review, [req.params.id], (err3, res3) => {
               if (err3) {
-                console.log(err2);
                 res.send({
                   uuid: uuidv1(),
                   status: 400,
